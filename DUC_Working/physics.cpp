@@ -35,7 +35,7 @@ void multiply(comp_matrix& A, comp_matrix& B, comp_matrix& C)
 }
 
 //Populate the coordinates of source, g
-void pop_source_coords(vector<pair<double, double> >& source_coords, double diameter, int M)
+void populate_source_coords(vector<pair<double, double> >& source_coords, double diameter, int M)
 {
 	double theta_step = (2*pi)/M;
 	double r = diameter/2;

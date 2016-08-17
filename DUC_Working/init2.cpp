@@ -39,6 +39,7 @@ void print(cell* c) {
 }
 
 
+/* push all cells at level "level" into "domain" */
 void populate(vector<cell*>& domain, cell* curr, int level, int curr_level) {
 
   if (curr_level == level) {
@@ -171,10 +172,6 @@ stringstream sss(theta_list);
     cerr << "Fooey!\n";
   }
   infile.close();
-
-
-  
-
   ifstream infile3("extents.csv");
   string s;
   getline(infile3, s);
@@ -207,7 +204,7 @@ int main()
 
   vector<pair<double, double> > source_coords(M);
 
-  pop_source_coords(source_coords, diameter, M);
+  populate_source_coords(source_coords, diameter, M);
   cell* root = new cell;
   side = 2;
   root->set_coords(0,0);
@@ -219,123 +216,59 @@ int main()
 
   create_tree(root, side);
   vector<cell* > domain;
-
-      //unite(root->children[0], root->children[1]->children[2]);
   cell* a1 = unite(root->children[1]->children[2], root->children[3]->children[0]->children[0]->children[0]);
-
-    // cell* a1 = unite(root->children[1]->children[2], root->children[3]->children[0]);
-    // cell* a2 = unite(root->children[0]->children[3], root->children[2]->children[1]);
-    // cell* a3 = unite(a1->children[0], a2->children[0]);
-
-
-    //cell* a2 = unite(a1, root->children[2]);
-   // cell* a3 = unite(a2, root->children[0]->children[3]->children[3]->children[3]);
-    //cell* a2 =  unite(root->children[0]->children[3], root->children[2]->children[1]);
-   //assert (*(a1->parent) == *root);
-  // assert (*(a2->parent) == *root);
   cout << "\nHI\n";
 
 
-   //cell* c1 = unite(a1->children[1], a2->children[1]);
+  cout << root->children.size() << "\n";
+  populate(domain, root, 1, 0);
 
-   // for (int i = 0; i < root->children.size(); i++) {
-   //  for (int j = 0; j < root->children.size(); j++) {
-   //     if (i == j) continue;
-   //     if (root->children[i]->area == 0.25) 
-   //      if (root->children[j]->area == 0.25) { 
-   //        unite(root->children[i], root->children[j]);
-   //        break;
-   //      }
-   //    }}
-
-   //  cout << root->children.size() << "HERE\n";
+  pngwriter png(width_figure, width_figure, 0, "unite.png");
+  plot(domain,png);
+  png.close();
 
 
-  //   }
+  /* Domain plotted */
 
-  // }
+  comp_matrix aux_GD(domain.size(), vector<dcomp>(domain.size()));
+  comp_matrix aux_GS(M, vector<dcomp>(domain.size()));
+  comp_matrix u_inc(domain.size(), vector<dcomp>(M));
 
-  //  for (int i = 0; i < root->children.size(); i++) {
-  //   for (int j = 0; j < root->children.size(); j++) {
-  //      if (i == j) continue;
-  //      if (root->children[i]->area == 0.5) 
-  //       if (root->children[j]->area == 0.5) { 
-  //         unite(root->children[i], root->children[j]);
-  //         break;
-  //       }
+  k_b = 2*pi;
 
-        
-  //   }
+  generate_aux_gd(aux_GD, domain);
+  generate_u_inc(u_inc, domain, thetas);
+  generate_aux_gs(aux_GS, domain, source_coords, u_inc);
+  back_propagation(aux_GD, aux_GS, f, u_inc, domain);
 
-  // }
+  /* divide algorithm */
+  vector<cell* > initial_domain(domain);
+  //display_chi(domain);
+  divide(domain,7, 3, thetas, f, source_coords);
+  reconstruct_domain(domain, initial_domain);
 
-   cout << root->children.size() << "\n";
-
- //  unite(root->children[2], root->children[3]);
-  //  unite(root->children[2], root->children[3]);
-
-    populate(domain, root, 1, 0);
-
-
-
-    pngwriter png(width_figure, width_figure, 0, "unite.png");
-    plot(domain,png);
-    png.close();
-
-
-    /* Domain plotted */
-
-    comp_matrix aux_GD(domain.size(), vector<dcomp>(domain.size()));
-    comp_matrix aux_GS(M, vector<dcomp>(domain.size()));
-    comp_matrix u_inc(domain.size(), vector<dcomp>(M));
-
-    k_b = 2*pi;
-
-
-
-    generate_aux_gd(aux_GD, domain);
-    generate_u_inc(u_inc, domain, thetas);
-    generate_aux_gs(aux_GS, domain, source_coords, u_inc);
-
-    back_propagation(aux_GD, aux_GS, f, u_inc, domain);
-
-
-
-    /* divide algorithm */
-    vector<cell* > initial_domain(domain);
-    //display_chi(domain);
-    divide(domain,7, 3, thetas, f, source_coords);
-    reconstruct_domain(domain, initial_domain);
-
-
-
-    vector<dcomp> chi_val;
-
-    dcomp max = domain[0]->chi;
-    int max_index = 0;
-    for (int i = 1; i < domain.size(); ++i)
+  vector<dcomp> chi_val;
+  dcomp max = domain[0]->chi;
+  int max_index = 0;
+  for (int i = 1; i < domain.size(); ++i)
+  {
+    if(real(domain[i]->chi) > real(max))
     {
-      if(real(domain[i]->chi) > real(max))
-      {
-        max = domain[i]->chi;
-        max_index = i;
-      }
+      max = domain[i]->chi;
+      max_index = i;
     }
+  }
 
-    pngwriter grad(width_figure, width_figure, 0, "chi5.png");
+  pngwriter grad(width_figure, width_figure, 0, "chi5.png");
 
-    for (int i = 0; i < domain.size(); ++i){
-    	point lowleft = modify(make_pair(domain[i]->get_x() - sqrt(domain[i]->area)/2, domain[i]->get_y() - sqrt(domain[i]->area)/2));
-    	point topright = modify(make_pair(domain[i]->get_x() + sqrt(domain[i]->area)/2, domain[i]->get_y() + sqrt(domain[i]->area)/2));        
-   		double color_red = (1+(real(domain[i]->chi))/(real(max)))/2;
-    	grad.filledsquare(lowleft.first, lowleft.second, topright.first, topright.second, color_red, 0.0, 0.0);     
-    }
-    grad.close();
-
-
-
-
-    return 0;
+  for (int i = 0; i < domain.size(); ++i){
+  	point lowleft = modify(make_pair(domain[i]->get_x() - sqrt(domain[i]->area)/2, domain[i]->get_y() - sqrt(domain[i]->area)/2));
+  	point topright = modify(make_pair(domain[i]->get_x() + sqrt(domain[i]->area)/2, domain[i]->get_y() + sqrt(domain[i]->area)/2));        
+ 		double color_red = (1+(real(domain[i]->chi))/(real(max)))/2;
+  	grad.filledsquare(lowleft.first, lowleft.second, topright.first, topright.second, color_red, 0.0, 0.0);     
+  }
+  grad.close();
+  return 0;
 }
 
 
