@@ -1,0 +1,20 @@
+# Config file for testing diel cyl scattering
+# White space in the config files don't matter
+# But file/variable names should not contain white spaces
+# All specifications must be in lower case
+# Wavelength in meters
+#
+lambda = 1
+meshfile = dielectric_cyl.inp
+outputfile = dielectric_cyl_scat.csv
+#
+#This can be a number or comma-separated list
+theta =0
+#
+#Now specify tissue details, imag<0 for loss
+real = 20
+imag = -10
+real = 10
+imag = -20
+real = 5
+imag = -5

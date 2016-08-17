@@ -1,0 +1,43 @@
+reset
+# RBC
+create Cylinder height 1 major radius 6 minor radius 6
+# OUT
+create Cylinder height 1 major radius 5.5 minor radius 5.5
+
+# air object interface (measurement interface) used this format in decoding(MATLAB)
+create Cylinder height 1 major radius 4.0 minor radius 4.0
+
+#(image reconstruction domain) used this format in decoding(MATLAB)
+create cylinder x 0.5 y 0.5 z 1
+  
+imprint volume 2 3 4 with volume 1 
+merge volume 2 3 4 with volume 1 
+del curve all
+
+surface 30 27 16 26 scheme TriMesh
+surface 27 16 26 size 0.15
+surface 30 size 0.05
+mesh surface 30 27 16 26
+
+Sideset 1 curve 2 
+sideset 1 name 'RBC'
+
+Sideset 2 curve 4
+sideset 2 name 'OUT'
+
+Sideset 3 curve 6  
+sideset 3 name 'TOP'
+
+Sideset 4 curve 8
+sideset 4 name 'DIE'
+
+Sideset 5 surface 27
+sideset 5 name 'AAB'
+
+Sideset 6 surface 30
+sideset 6 name 'T01'
+
+set duplicate block elements off
+block 1 surface 30 27 16 26
+set Abaqus precision 6
+export Abaqus "/home/shreyas/Dropbox/research-uday-csi/DUC/Inverse Solver/cyl_2.inp" Block 1 dimension 3 everything overwrite cubitids 

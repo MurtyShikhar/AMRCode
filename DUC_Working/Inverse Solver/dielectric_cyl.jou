@@ -1,0 +1,51 @@
+reset
+# RBC
+create Cylinder height 1 major radius 7 minor radius 7
+# OUT
+create Cylinder height 1 major radius 6 minor radius 6
+
+# air object interface (measurement interface) used this format in decoding(MATLAB)
+create Cylinder height 1 major radius 3.5 minor radius 3.5
+
+#(image reconstruction domain) used this format in decoding(MATLAB)
+create Cylinder height 100000 major radius 0.1 minor radius 0.1
+create Cylinder height 100000 major radius 0.15 minor radius 0.15
+create Cylinder height 100000 major radius 0.2 minor radius 0.2
+  
+imprint volume 2 3 4 5 6 with volume 1 
+merge volume 2 3 4 5 6 with volume 1 
+del curve all
+
+surface 46 49 55 63 26 61 scheme TriMesh
+surface 63 26 61 size 0.03
+surface 46 49 55 size 0.01
+mesh surface 46 49 55 63 26 61
+
+Sideset 1 curve 2 
+sideset 1 name 'RBC'
+
+Sideset 2 curve 4
+sideset 2 name 'OUT'
+
+Sideset 3 curve 6  
+sideset 3 name 'TOP'
+
+Sideset 4 curve 8 
+sideset 4 name 'DIE'
+
+Sideset 5 surface 38
+sideset 5 name 'AAB'
+
+Sideset 6 surface 49
+sideset 6 name 'T01'
+
+Sideset 7 surface 46
+sideset 7 name 'T02'
+
+Sideset 8 surface 55
+sideset 8 name 'T03'
+
+set duplicate block elements off
+block 1 surface 49 46 55 63 26 61
+set Abaqus precision 6
+export Abaqus "/home/sura1/Desktop/Code/dielectric_cyl.inp" Block 1 dimension 3 everything overwrite cubitids 
