@@ -77,8 +77,8 @@ bool touch(const edge& first,const edge& other) {
 
 struct cell {
 	vector<cell*> children; // children of the cell
-	cell* parent; // unique parent of the cell
-	pair<double,double> coord; // coordinate of the centre of the cell.. not required
+	cell* parent; // unique parent of the cellnot
+	pair<double,double> coord; // coordinate of the centre of the cell..  required
 	double area; // area of the cell. useful for aux_GS, aux_GD calculation
 	dcomp chi; // chi of the cell
 	bool flag; 

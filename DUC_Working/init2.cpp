@@ -32,10 +32,8 @@ void print(cell* c) {
 
   cout << "COORDS: "<<c->get_x() << c->get_y() << " ";
   for (int i = 0; i < c->edges.size(); i++) {
-
     cout << c->edges[i].s.first << " ---> " << c->edges[i].s.second << " ";
     cout << c->edges[i].e.first << " ---> " << c->edges[i].e.second << " ";
-
   }
   cout << "\n";
 }
@@ -203,35 +201,27 @@ int main()
 	comp_matrix f;
 	vector<double> thetas;
 
-  read_data(f, thetas);
+  read_data(f, thetas);  	
+  diameter = r_meas;
+  side = 2*tr_x;
 
- 	//double lambda = 1;
-  	
-    //cout<<"dod\n";
-  	
-    diameter = r_meas;
-    side = 2*tr_x;
+  vector<pair<double, double> > source_coords(M);
 
-    vector<pair<double, double> > source_coords(M);
+  pop_source_coords(source_coords, diameter, M);
+  cell* root = new cell;
+  side = 2;
+  root->set_coords(0,0);
+  root->set_area(side*side);
+  root->add_edge(edge(make_pair(-side/2,-side/2), make_pair(-side/2,side/2), 1));
+  root->add_edge(edge(make_pair(side/2,-side/2), make_pair(side/2,side/2), 1));
+  root->add_edge(edge(make_pair(-side/2,-side/2), make_pair(side/2,-side/2), 0));
+  root->add_edge(edge(make_pair(-side/2,side/2), make_pair(side/2,side/2), 0));
 
-    pop_source_coords(source_coords, diameter, M);
-    //cout<<"side : "<<side<<"\n";
-    cell* root = new cell;
-    side = 2;
-    root->set_coords(0,0);
-    root->set_area(side*side);
-    root->add_edge(edge(make_pair(-side/2,-side/2), make_pair(-side/2,side/2), 1));
-    root->add_edge(edge(make_pair(side/2,-side/2), make_pair(side/2,side/2), 1));
-    root->add_edge(edge(make_pair(-side/2,-side/2), make_pair(side/2,-side/2), 0));
-    root->add_edge(edge(make_pair(-side/2,side/2), make_pair(side/2,side/2), 0));
-
-    create_tree(root, side);
-    //cout<<"whoo\n";
-
-    vector<cell* > domain;
+  create_tree(root, side);
+  vector<cell* > domain;
 
       //unite(root->children[0], root->children[1]->children[2]);
-   cell* a1 = unite(root->children[1]->children[2], root->children[3]->children[0]->children[0]->children[0]);
+  cell* a1 = unite(root->children[1]->children[2], root->children[3]->children[0]->children[0]->children[0]);
 
     // cell* a1 = unite(root->children[1]->children[2], root->children[3]->children[0]);
     // cell* a2 = unite(root->children[0]->children[3], root->children[2]->children[1]);
